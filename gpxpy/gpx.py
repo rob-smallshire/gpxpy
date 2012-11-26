@@ -21,9 +21,9 @@ import math as mod_math
 import datetime as mod_datetime
 import collections as mod_collections
 
-import utils as mod_utils
+from . import utils as mod_utils
 import copy as mod_copy
-import geo as mod_geo
+from . import geo as mod_geo
 
 """
 GPX related stuff

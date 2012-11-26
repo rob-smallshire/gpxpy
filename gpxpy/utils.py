@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pdb
+
 import logging
 import xml.sax.saxutils as mod_saxutils
 
@@ -24,7 +26,7 @@ def to_xml(tag, attributes={}, content=None, default=None, escape=False):
         content = default
 
     if attributes:
-        for attribute in attributes.keys():
+        for attribute in list(attributes.keys()):
             result += ' %s="%s"' % (attribute, attributes[attribute])
     if content:
         if escape:
@@ -38,8 +40,11 @@ def to_xml(tag, attributes={}, content=None, default=None, escape=False):
 
     result += ''
 
-    if isinstance(result, unicode):
-        result = result.encode('utf-8')
+    if isinstance(result, str):
+        encoded = result.encode('utf-8')
+        # Python3 TODO
+        if not isinstance(encoded, bytes):
+            result = encoded
 	
     return result
 

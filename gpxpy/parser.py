@@ -21,8 +21,8 @@ import datetime as mod_datetime
 
 import xml.dom.minidom as mod_minidom
 
-import gpx as mod_gpx
-import utils as mod_utils
+from . import gpx as mod_gpx
+from . import utils as mod_utils
 import re as mod_re
 
 def parse_time(string):
@@ -30,12 +30,12 @@ def parse_time(string):
         return None
     try:
         return mod_datetime.datetime.strptime(string, mod_gpx.DATE_FORMAT)
-    except Exception, e:
+    except Exception as e:
         if mod_re.match('^.*\.\d+Z$', string):
             string = mod_re.sub('\.\d+Z', 'Z', string)
         try:
             return mod_datetime.datetime.strptime(string, mod_gpx.DATE_FORMAT)
-        except Exception, e:
+        except Exception as e:
             mod_logging.error('Invalid timestemp %s' % string)
             return None
 
@@ -52,7 +52,7 @@ class AbstractXMLParser:
         if hasattr(xml_or_file, 'read'):
             self.xml = xml_or_file.read()
         else:
-            if isinstance(xml_or_file, unicode):
+            if isinstance(xml_or_file, str):
                 self.xml = xml_or_file.encode('utf-8')
             else:
                 self.xml = str(xml_or_file)
@@ -92,7 +92,7 @@ class GPXParser(AbstractXMLParser):
             self.__parse_dom(dom)
 
             return self.gpx
-        except Exception, e:
+        except Exception as e:
             mod_logging.debug('Error in:\n%s\n-----------\n' % self.xml)
             mod_logging.exception(e)
             self.error = str(e)
@@ -144,19 +144,19 @@ class GPXParser(AbstractXMLParser):
         self.valid = True
 
     def _parse_bounds(self, node):
-        if node.attributes.has_key('minlat'):
+        if 'minlat' in node.attributes.keys():
             self.gpx.min_latitude = mod_utils.to_number(node.attributes['minlat'].nodeValue)
-        if node.attributes.has_key('maxlat'):
+        if 'maxlat' in node.attributes.keys():
             self.gpx.min_latitude = mod_utils.to_number(node.attributes['maxlat'].nodeValue)
-        if node.attributes.has_key('minlon'):
+        if 'minlon' in node.attributes.keys():
             self.gpx.min_longitude = mod_utils.to_number(node.attributes['minlon'].nodeValue)
-        if node.attributes.has_key('maxlon'):
+        if 'maxlon' in node.attributes.keys():
             self.gpx.min_longitude = mod_utils.to_number(node.attributes['maxlon'].nodeValue)
 
     def _parse_waypoint(self, node):
-        if not node.attributes.has_key('lat'):
+        if 'lat' not in node.attributes.keys():
             raise mod_gpx.GPXException('Waypoint without latitude')
-        if not node.attributes.has_key('lon'):
+        if 'lon' not in node.attributes.keys():
             raise mod_gpx.GPXException('Waypoint without longitude')
 
         lat = mod_utils.to_number(node.attributes['lat'].nodeValue)
@@ -220,9 +220,9 @@ class GPXParser(AbstractXMLParser):
         return route
 
     def _parse_route_point(self, node):
-        if not node.attributes.has_key('lat'):
+        if 'lat' not in node.attributes.keys():
             raise mod_gpx.GPXException('Waypoint without latitude')
-        if not node.attributes.has_key('lon'):
+        if 'lon' not in node.attributes.keys():
             raise mod_gpx.GPXException('Waypoint without longitude')
 
         lat = mod_utils.to_number(node.attributes['lat'].nodeValue)
@@ -297,11 +297,11 @@ class GPXParser(AbstractXMLParser):
 
     def __parse_track_point(self, node):
         latitude = None
-        if node.attributes.has_key('lat'):
+        if 'lat' in node.attributes.keys():
             latitude = mod_utils.to_number(node.attributes['lat'].nodeValue)
 
         longitude = None
-        if node.attributes.has_key('lon'):
+        if 'lon' in node.attributes.keys():
             longitude = mod_utils.to_number(node.attributes['lon'].nodeValue)
 
         time_node = mod_utils.find_first_node(node, 'time')
@@ -357,7 +357,7 @@ class KMLParser(AbstractXMLParser):
             self.__parse_dom(dom)
 
             return self.gpx
-        except Exception, e:
+        except Exception as e:
             mod_logging.debug('Error in:\n%s\n-----------\n' % self.xml)
             mod_logging.exception(e)
             self.error = str(e)
@@ -380,20 +380,20 @@ if __name__ == '__main__':
     parser = mod_gpx.GPXParser(gpx_xml)
     gpx = parser.parse()
 
-    print gpx.to_xml()
+    print(gpx.to_xml())
 
     if parser.is_valid():
-        print 'TRACKS:'
+        print('TRACKS:')
         for track in gpx.tracks:
-            print 'name%s, 2d:%s, 3d:%s' % (track.name, track.length_2d(), track.length_3d())
-            print '\tTRACK SEGMENTS:'
+            print('name%s, 2d:%s, 3d:%s' % (track.name, track.length_2d(), track.length_3d()))
+            print('\tTRACK SEGMENTS:')
             for track_segment in track.segments:
-                print '\t2d:%s, 3d:%s' % (track_segment.length_2d(), track_segment.length_3d())
+                print('\t2d:%s, 3d:%s' % (track_segment.length_2d(), track_segment.length_3d()))
 
-        print 'ROUTES:'
+        print('ROUTES:')
         for route in gpx.routes:
-            print route.name
+            print(route.name)
     else:
-        print 'error: %s' % parser.get_error()
+        print('error: %s' % parser.get_error())
 
 
