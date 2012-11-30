@@ -325,7 +325,7 @@ class GPXParser(AbstractXMLParser):
 
 
     def __parse_link(self, node):
-        href = node.attribute['href'].nodeValue if has_key(node.attributes, 'href') else None
+        href = node.attributes['href'].nodeValue if has_key(node.attributes, 'href') else None
 
         text_node = mod_utils.find_first_node(node, 'text')
         text = self.get_node_data(text_node)
