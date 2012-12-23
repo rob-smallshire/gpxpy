@@ -101,3 +101,21 @@ def make_str(s):
         if isinstance(s, unicode):
             return s.encode("utf-8")
     return str(s)
+
+
+def excerpt(xml_or_file, length=100):
+    """Extract the first part of a string or file.
+
+    Args:
+        xml_or_file: A string or file-like object.
+        length: The number of characters to be excerpted.
+
+    Returns:
+        The first length characters or xml_or_file.
+    """
+    try:
+        xml_or_file.seek(0)
+        text = xml_or_file.read(length)
+    except AttributeError:
+        text = xml_or_file[:length]
+    return text

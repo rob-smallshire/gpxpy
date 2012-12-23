@@ -21,19 +21,15 @@ def parse(xml_or_file, parser='lxml'):
 
     from . import gpx as mod_gpx
     from . import parser as mod_parser
+    from gpxpy.utils import excerpt
 
     parser = mod_parser.GPXParser(xml_or_file, parser=parser)
 
     gpx = parser.parse()
 
     if not parser.is_valid():
-        NUM_EXCERPT_CHARS = 100
-        try:
-            xml_or_file.seek(0)
-            excerpt = xml_or_file.read(NUM_EXCERPT_CHARS)
-        except AttributeError:
-            excerpt = xml_or_file[:NUM_EXCERPT_CHARS]
-        raise mod_gpx.GPXException('Error parsing {0}: {1}'.format(excerpt, parser.get_error()))
+        raise mod_gpx.GPXException('Error parsing "{0}": {1}'.format(
+            excerpt(xml_or_file), parser.get_error()))
 
     return gpx
 
