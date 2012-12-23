@@ -49,6 +49,11 @@ from gpxpy.utils import make_str
 
 PYTHON_VERSION = mod_sys.version.split(' ')[0]
 
+if PYTHON_VERSION[0] == '3':
+    from io import StringIO
+else:
+    from StringIO import StringIO
+
 def equals(object1, object2, ignore=None):
     """ Testing purposes only """
 
@@ -90,6 +95,17 @@ def equals(object1, object2, ignore=None):
     return True
 
 # TODO: Track segment speed in point test
+
+class GpxpyTests(mod_unittest.TestCase):
+
+    def test_failure_from_invalid_string(self):
+        self.assertRaises(mod_gpxpy.GPXException, lambda: mod_gpxpy.parse("This is not a valid GPX string"))
+
+
+    def test_failure_from_invalid_file(self):
+        invalid_gpx_file = StringIO("This is not a valid GPX string")
+        self.assertRaises(mod_gpxpy.GPXException, lambda: mod_gpxpy.parse(invalid_gpx_file))
+
 
 class LxmlTests(mod_unittest.TestCase):
 

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .gpx import GPXException
+
 def parse(xml_or_file, parser='lxml'):
     """ Parse xml (string) or file object. This is just an wrapper for GPXParser.parse() function """
 
@@ -25,7 +27,13 @@ def parse(xml_or_file, parser='lxml'):
     gpx = parser.parse()
 
     if not parser.is_valid():
-        raise mod_gpx.GPXException('Error parsing {0}: {1}'.format(xml_or_file[0 : 100], parser.get_error()))
+        NUM_EXCERPT_CHARS = 100
+        try:
+            xml_or_file.seek(0)
+            excerpt = xml_or_file.read(NUM_EXCERPT_CHARS)
+        except AttributeError:
+            excerpt = xml_or_file[:NUM_EXCERPT_CHARS]
+        raise mod_gpx.GPXException('Error parsing {0}: {1}'.format(excerpt, parser.get_error()))
 
     return gpx
 
